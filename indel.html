@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gaussian Splatting Model Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/loaders/PLYLoader.js"></script>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+    #info {
+      position: absolute; top: 10px; left: 10px; color: #fff;
+      background: rgba(0,0,0,0.5); padding: 8px; z-index:100;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <b>Model:</b> angel-with-candlestick.compressed.ply<br>
+    <i>Click &amp; drag to rotate, scroll to zoom.</i>
+  </div>
+  <script>
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    let renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
+    // Controls
+    let controls;
+    function addControls() {
+      const script = document.createElement('script');
+      script.onload = function() {
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+      };
+      script.src = 'https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/controls/OrbitControls.js';
+      document.head.appendChild(script);
+    }
+    addControls();
+
+    // Lighting
+    let light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
+
+    // Load PLY
+    let loader = new THREE.PLYLoader();
+    loader.load('models/angel-with-candlestick.compressed.ply', function (geometry) {
+      geometry.computeVertexNormals();
+      let material = new THREE.MeshStandardMaterial({ color: 0xcccccc, flatShading: false });
+      let mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      camera.position.z = 1.5;
+      animate();
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (controls) controls.update();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
