@@ -23,7 +23,7 @@
     scene.add(light);
 
     let loader = new THREE.PLYLoader();
-    loader.load('models/your_model.ply', function (geometry) {
+    loader.load('models/angel-with-candlestick.compressed.ply', function (geometry) {
       geometry.computeVertexNormals();
       let material = new THREE.MeshStandardMaterial({ color: 0x0055ff, flatShading: true });
       let mesh = new THREE.Mesh(geometry, material);
